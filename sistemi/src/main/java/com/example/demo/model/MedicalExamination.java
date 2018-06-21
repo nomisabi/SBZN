@@ -24,10 +24,9 @@ public class MedicalExamination implements Serializable{
 	 @OneToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
 	 private Diagnosis diagnosis;
 	 
-	 
 	 private Double temperature;
 	 
-	 @ManyToMany(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
+	 @ManyToMany( fetch = FetchType.EAGER)
 	 private Set<SympomForExamination> sympom  = new HashSet<>();
 
 	 public MedicalExamination(Long id, Diagnosis diagnosis, Double temperature, Set<SympomForExamination> sympom) {

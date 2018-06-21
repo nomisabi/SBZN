@@ -95,4 +95,18 @@ public class UserDTO {
 	
 	}
 
+	@Override
+	public String toString() {
+		return "UserDTO [id=" + id + ", username=" + username + ", email=" + email + ", firstname=" + firstname
+				+ ", lastname=" + lastname + ", skill=" + skill + "]";
+	}
+
+	public User update(User user) {
+		user.setEmail(email);
+		user.setFirstName(firstname);
+		user.setLastName(lastname);
+		user.setSkill(skill);
+		return user;
+	}
+	
 }

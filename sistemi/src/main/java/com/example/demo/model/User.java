@@ -25,10 +25,10 @@ public class User {
 	private String lastName;
 	private String skill;
 	
-	@OneToMany(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
+	@OneToMany(cascade = {CascadeType.REFRESH }, fetch = FetchType.EAGER)
 	private Set<Patient> patients = new HashSet<>();
 	
-	@OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.REFRESH)
+	@OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = {CascadeType.REFRESH })
 	private Set<UserAuthority> userAuthorities = new HashSet<>();
 
 	public User() {
@@ -138,4 +138,12 @@ public class User {
 		return false;
 	}
 
+	@Override
+	public String toString() {
+		return "User [id=" + id + ", username=" + username + ", password=" + password + ", email=" + email
+				+ ", firstName=" + firstName + ", lastName=" + lastName + ", skill=" + skill + ", patients=" + patients
+				+ ", userAuthorities=" + userAuthorities + "]";
+	}
+
+	
 }

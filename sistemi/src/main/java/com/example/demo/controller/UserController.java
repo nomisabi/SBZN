@@ -31,6 +31,7 @@ import com.example.demo.dto.RegisterDTO;
 import com.example.demo.dto.UserDTO;
 import com.example.demo.dto.UserPasswordDTO;
 import com.example.demo.model.User;
+import com.example.demo.model.UserAuthority;
 import com.example.demo.security.TokenUtils;
 import com.example.demo.service.UserService;
 
@@ -71,33 +72,42 @@ public class UserController {
 		} catch (Exception e) {
 			return new ResponseEntity<>("Invalid login", HttpStatus.BAD_REQUEST);
 		}
-	}
-/*
+		}
+
 	@RequestMapping(value = "/register", method = RequestMethod.POST, consumes = "application/json")
 	public ResponseEntity<Void> register(
 			@RequestBody RegisterDTO registerDTO) {
 		if (!registerDTO.getPassword().equals(registerDTO.getPassword2())) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
-
-		User user = RegisterDTO.getTenant(registerDTO);
+		System.out.println("registeste");
+		User user = new User();
+		user.setEmail(registerDTO.getEmail());
+		user.setUsername(registerDTO.getUsername());
+		user.setPassword(passwordEncoder.encode(registerDTO.getPassword()));
 		user = userService.save(user, "ROLE_USER");
 		
+		System.out.println(user.toString());
 		return new ResponseEntity<>(HttpStatus.CREATED);
 
 	}
-*/
+
 	@RequestMapping(value = "/users", method = RequestMethod.GET)
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	/*** get list of users ***/
-	public ResponseEntity<List<UserDTO>> getUsers(Pageable page) {
-		Page<User> users = userService.findAll(page);
-
+	public ResponseEntity<List<UserDTO>> getUsers() {
+		List<User> users = userService.findAll();
+		System.out.println(users.size());
 		List<UserDTO> usersDTO = new ArrayList<>();
 		for (User user : users) {
-			usersDTO.add(new UserDTO(user));
+			System.out.print(user.getUsername()+": ");
+			for (UserAuthority auth: user.getUserAuthorities()) {
+				if (auth.getAuthority().getName().equals("ROLE_USER"))
+					usersDTO.add(new UserDTO(user));
+			}			
+			System.out.println();
 		}
-
+		System.out.println(usersDTO.size());
 		return new ResponseEntity<>(usersDTO, HttpStatus.OK);
 	}
 
@@ -112,19 +122,35 @@ public class UserController {
 		}
 		return new ResponseEntity<>(new UserDTO(user.get()), HttpStatus.OK);
 	}
+	
+	@RequestMapping(value = "/users/{id}", method = RequestMethod.DELETE)
+	
+	/*** get user by id ***/
+	public ResponseEntity<Void> deleteUser(
+			 @PathVariable Long id) {
+		System.out.println("id: "+id);
+		Optional<User> user = userService.findOne(id);
+		if (user.get() == null) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+		userService.delete(id);
+		return new ResponseEntity<>( HttpStatus.OK);
+	}
 
 	@RequestMapping(value = "/users", method = RequestMethod.PUT, consumes = "application/json")
 	/*** update user ***/
 	public ResponseEntity<UserDTO> updateUser(
 			 @RequestBody UserDTO userDTO) {
+		System.out.println("barmi");
+		System.out.println(userDTO);
 		Optional<User> user = userService.findOne(userDTO.getId());
 
 		if (user.get() == null) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
-
-		User user1 = userService.update(user.get());
-
+		
+		User user1 = userService.update(userDTO.update(user.get()));
+		System.out.println(userDTO);
 		return new ResponseEntity<>(new UserDTO(user1), HttpStatus.OK);
 	}
 

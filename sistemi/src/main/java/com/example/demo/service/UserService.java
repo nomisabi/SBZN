@@ -1,5 +1,4 @@
 package com.example.demo.service;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -30,14 +29,13 @@ public class UserService {
 	PasswordEncoder passwordEncoder;
 
 	public User save(User user, String role) {
-		
+		System.out.println("save");
 		user = userRepository.save(user);
 		Authority authority = authorityRepository.findByName(role);
 
 		if (authority != null) {
 			UserAuthority userAuthority = new UserAuthority(user, authority);
 			userAuthority = userAuthorityRepository.save(userAuthority);
-
 		}
 		return user;
 	}
@@ -46,12 +44,18 @@ public class UserService {
 		return userRepository.save(user);
 	}
 
+	public void delete(Long id) {
+		Long autId= userAuthorityRepository.findByUserAndAuthority(id, 1L);
+		userAuthorityRepository.deleteById(autId);
+		userRepository.deleteById(id);
+	}
+	
 	public Page<User> find(Pageable page, String role) {
 		return userRepository.find(role, page);
 	}
 
-	public Page<User> findAll(Pageable page) {
-		return userRepository.findAll(page);
+	public List<User> findAll() {
+		return userRepository.findAll();
 	}
 
 	public Optional<User> findOne(Long id) {

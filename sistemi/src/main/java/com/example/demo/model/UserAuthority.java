@@ -15,9 +15,9 @@ public class UserAuthority {
 	@GeneratedValue
 	private Long id;
 
-	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
+	@ManyToOne(cascade = {CascadeType.REFRESH }, fetch = FetchType.EAGER)
 	private User user;
-	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
+	@ManyToOne(cascade = {CascadeType.REFRESH}, fetch = FetchType.EAGER)
 	private Authority authority;
 
 	public UserAuthority() {
