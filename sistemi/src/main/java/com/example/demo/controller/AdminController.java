@@ -19,11 +19,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.dto.DiseaseDTO;
 import com.example.demo.dto.IngredientDTO;
 import com.example.demo.dto.LoginDTO;
 import com.example.demo.dto.MedicineDTO;
+import com.example.demo.dto.SymptomDTO;
+import com.example.demo.model.Disease;
 import com.example.demo.model.Ingredient;
 import com.example.demo.model.Medicine;
+import com.example.demo.model.Symptom;
 import com.example.demo.security.TokenUtils;
 import com.example.demo.service.DiseaseService;
 import com.example.demo.service.IngredientService;
@@ -49,28 +53,6 @@ public class AdminController {
 
 	
 
-	@RequestMapping(value = "/diseases", method = RequestMethod.POST, consumes = "application/json")
-	public ResponseEntity<String> newDisease() {
-			return new ResponseEntity<>("Invalid login", HttpStatus.BAD_REQUEST);		
-	}
-	
-	@RequestMapping(value = "/diseases", method = RequestMethod.GET, consumes = "application/json")
-	public ResponseEntity<String> getDiseases(
-			@RequestBody LoginDTO loginDTO) {
-			return new ResponseEntity<>("Invalid login", HttpStatus.BAD_REQUEST);		
-	}
-	
-	@RequestMapping(value = "/diseases/{id}", method = RequestMethod.GET, consumes = "application/json")
-	public ResponseEntity<String> getDisease(
-			@RequestBody LoginDTO loginDTO) {
-			return new ResponseEntity<>("Invalid login", HttpStatus.BAD_REQUEST);		
-	}
-	
-	@RequestMapping(value = "/diseases/{id}", method = RequestMethod.DELETE, consumes = "application/json")
-	public ResponseEntity<String> deleteDisease(
-			@RequestBody LoginDTO loginDTO) {
-			return new ResponseEntity<>("Invalid login", HttpStatus.BAD_REQUEST);		
-	}
 	
 	@RequestMapping(value = "/medicines", method = RequestMethod.POST, consumes = "application/json")
 	public ResponseEntity<String> newMedicine(@RequestBody MedicineDTO medicineDTO) {
@@ -140,6 +122,75 @@ public class AdminController {
 		ingredientService.delete(id);
 		return new ResponseEntity<>(HttpStatus.OK);	
 	}
+	
+	
+	@RequestMapping(value = "/symptoms", method = RequestMethod.POST, consumes = "application/json")
+	public ResponseEntity<String> newSymptom(@RequestBody SymptomDTO symptomDTO) {
+		Symptom i= symptomDTO.getSymptom(symptomDTO);
+		// findBy name
+		i=symptomService.save(i);
+		if (i==null)
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);		
+		return new ResponseEntity<>(HttpStatus.CREATED);		
+	}
+	
+	@RequestMapping(value = "/symptoms", method = RequestMethod.GET, consumes = "application/json")
+	public ResponseEntity<List<Symptom>> getSymptoms() {
+		List<Symptom> ing= symptomService.findAll();
+		return new ResponseEntity<>(ing, HttpStatus.OK);		
+	}
+	
+	@RequestMapping(value = "/symptoms/{id}", method = RequestMethod.GET, consumes = "application/json")
+	public ResponseEntity<Symptom> getSymptom( @PathVariable Long id) {
+		Optional<Symptom> i= symptomService.findOne(id);
+		if (i.get()==null)
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);	
+		return new ResponseEntity<>(i.get(),HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/symptoms/{id}", method = RequestMethod.DELETE, consumes = "application/json")
+	public ResponseEntity<Void> deleteSymptom(
+			 @PathVariable Long id) {
+		Optional<Symptom> i= symptomService.findOne(id);
+		if (i.get()==null)
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		symptomService.delete(id);
+		return new ResponseEntity<>(HttpStatus.OK);	
+	}
 
+	
+	@RequestMapping(value = "/diseases", method = RequestMethod.POST, consumes = "application/json")
+	public ResponseEntity<String> newDisease(@RequestBody DiseaseDTO diseaseDTO) {
+		Disease i= diseaseDTO.getDisease(diseaseDTO);
+		// findBy name
+		i=diseaseService.save(i);
+		if (i==null)
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);		
+		return new ResponseEntity<>(HttpStatus.CREATED);		
+	}
+	
+	@RequestMapping(value = "/diseases", method = RequestMethod.GET, consumes = "application/json")
+	public ResponseEntity<List<Disease>> getDiseases() {
+		List<Disease> ing= diseaseService.findAll();
+		return new ResponseEntity<>(ing, HttpStatus.OK);		
+	}
+	
+	@RequestMapping(value = "/diseases/{id}", method = RequestMethod.GET, consumes = "application/json")
+	public ResponseEntity<Disease> getDisease( @PathVariable Long id) {
+		Optional<Disease> i= diseaseService.findOne(id);
+		if (i.get()==null)
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);	
+		return new ResponseEntity<>(i.get(),HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/diseases/{id}", method = RequestMethod.DELETE, consumes = "application/json")
+	public ResponseEntity<Void> deleteDisease(
+			 @PathVariable Long id) {
+		Optional<Disease> i= diseaseService.findOne(id);
+		if (i.get()==null)
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		diseaseService.delete(id);
+		return new ResponseEntity<>(HttpStatus.OK);	
+	}
 
 }

@@ -76,6 +76,17 @@
 			<artifactId>kie-ci</artifactId>
 			<version>6.5.0.Final</version>
 		</dependency>
+				<dependency>
+            <groupId>org.kie</groupId>
+            <artifactId>kie-spring</artifactId>
+            <version>6.5.0.Final</version>
+        </dependency>
+		<dependency>
+	  		<groupId>sbzn</groupId>
+	  		<artifactId>sbzn-kjar</artifactId>
+	  		<type>jar</type>
+	  		<version>0.0.1-SNAPSHOT</version>
+  		</dependency>
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-test</artifactId>

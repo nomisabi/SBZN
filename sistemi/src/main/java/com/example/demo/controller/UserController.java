@@ -80,13 +80,13 @@ public class UserController {
 		if (!registerDTO.getPassword().equals(registerDTO.getPassword2())) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
-		System.out.println("registeste");
 		User user = new User();
 		user.setEmail(registerDTO.getEmail());
 		user.setUsername(registerDTO.getUsername());
-		user.setPassword(passwordEncoder.encode(registerDTO.getPassword()));
+		user.setPassword(passwordEncoder.encode(registerDTO.getPassword()));	
 		user = userService.save(user, "ROLE_USER");
-		
+		if (user == null) 
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		System.out.println(user.toString());
 		return new ResponseEntity<>(HttpStatus.CREATED);
 
@@ -97,17 +97,14 @@ public class UserController {
 	/*** get list of users ***/
 	public ResponseEntity<List<UserDTO>> getUsers() {
 		List<User> users = userService.findAll();
-		System.out.println(users.size());
+
 		List<UserDTO> usersDTO = new ArrayList<>();
 		for (User user : users) {
-			System.out.print(user.getUsername()+": ");
 			for (UserAuthority auth: user.getUserAuthorities()) {
 				if (auth.getAuthority().getName().equals("ROLE_USER"))
 					usersDTO.add(new UserDTO(user));
 			}			
-			System.out.println();
 		}
-		System.out.println(usersDTO.size());
 		return new ResponseEntity<>(usersDTO, HttpStatus.OK);
 	}
 

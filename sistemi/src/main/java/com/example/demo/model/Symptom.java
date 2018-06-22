@@ -2,10 +2,14 @@ package com.example.demo.model;
 
 import java.io.Serializable;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
@@ -21,21 +25,41 @@ public class Symptom implements Serializable{
     private String name;
     
     @Column
-    private Boolean specific;
+    private boolean specificSymptom;
     
+    @Column
+    private int days;
+    
+    @Column
+    private int times;
+    
+    @Column
+    private String symptomForSpecific;
     
 	public Symptom(Long id, String name) {
 		super();
 		this.id = id;
 		this.name = name;
-		this.specific=false;
+		this.specificSymptom=false;
 	}	
 	
-	public Symptom(Long id, String name, Boolean specific) {
+	public Symptom(Long id, String name, boolean specific, int days, int times, String symptomForSpecific) {
 		super();
 		this.id = id;
 		this.name = name;
-		this.specific = specific;
+		this.specificSymptom = specific;
+		this.days = days;
+		this.times = times;
+		this.symptomForSpecific = symptomForSpecific;
+	}
+
+
+
+	public Symptom(Long id, String name, boolean specific) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.specificSymptom = specific;
 	}
 
 	public Symptom() {
@@ -58,12 +82,46 @@ public class Symptom implements Serializable{
 		this.name = name;
 	}
 
-	public Boolean getSpecific() {
-		return specific;
+
+
+	public boolean isSpecificSymptom() {
+		return specificSymptom;
 	}
 
-	public void setSpecific(Boolean specific) {
-		this.specific = specific;
+	public void setSpecificSymptom(boolean specificSymptom) {
+		this.specificSymptom = specificSymptom;
+	}
+
+	public int getDays() {
+		return days;
+	}
+
+
+
+	public void setDays(int days) {
+		this.days = days;
+	}
+
+
+
+	public int getTimes() {
+		return times;
+	}
+
+
+
+	public void setTimes(int times) {
+		this.times = times;
+	}
+
+
+
+	public String getSymptomForSpecific() {
+		return symptomForSpecific;
+	}
+
+	public void setSymptomForSpecific(String symptomForSpecific) {
+		this.symptomForSpecific = symptomForSpecific;
 	}
 
 	

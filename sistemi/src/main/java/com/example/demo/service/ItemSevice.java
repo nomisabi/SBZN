@@ -15,17 +15,16 @@ public class ItemSevice {
 	@Autowired
 	private ItemRepository itemRep;
 	
-	//@Autowired
-	//private KieContainer kieContainer;
+	@Autowired
+	private KieContainer kieContainer;
 	
     public Item getClassifiedItem(Item i) {
-   /*   KieSession kieSession = kieContainer.newKieSession("ExampleSession");
+      KieSession kieSession = kieContainer.newKieSession();
       kieSession.insert(i);
       kieSession.fireAllRules();
       kieSession.dispose();
       i=save(i);
-      return i;*/
-    	return null;
+      return i;
   }
     
     public Item save(Item i) {

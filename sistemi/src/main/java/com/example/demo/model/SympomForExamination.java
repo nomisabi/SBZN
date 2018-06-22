@@ -7,6 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 @Entity
@@ -20,6 +21,7 @@ public class SympomForExamination implements Serializable{
 	 private Boolean value;
 	 
 	 @ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
+	 @JoinColumn(name = "symptom_id")
 	 private Symptom symptom;
 
 	public SympomForExamination(Long id, Boolean value, Symptom symptom) {

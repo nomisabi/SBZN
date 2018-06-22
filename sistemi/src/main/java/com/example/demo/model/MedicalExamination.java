@@ -9,7 +9,10 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
 @Entity
@@ -26,15 +29,23 @@ public class MedicalExamination implements Serializable{
 	 
 	 private Double temperature;
 	 
+	 @ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
+	 private User doctor;
+	 
 	 @ManyToMany( fetch = FetchType.EAGER)
 	 private Set<SympomForExamination> sympom  = new HashSet<>();
 
-	 public MedicalExamination(Long id, Diagnosis diagnosis, Double temperature, Set<SympomForExamination> sympom) {
+	 @ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
+	 private Patient patient;
+	 
+	 public MedicalExamination(Long id, Diagnosis diagnosis, Double temperature, Set<SympomForExamination> sympom, User doctor, Patient pateint) {
 		super();
 		this.id = id;
 		this.diagnosis = diagnosis;
 		this.temperature = temperature;
 		this.sympom = sympom;
+		this.doctor=doctor;
+		this.patient=pateint;
 	}
 
 	 public MedicalExamination() {
@@ -73,6 +84,26 @@ public class MedicalExamination implements Serializable{
 	public void setSympom(Set<SympomForExamination> sympom) {
 		this.sympom = sympom;
 	}
+
+	public User getDoctor() {
+		return doctor;
+	}
+
+	public void setDoctor(User doctor) {
+		this.doctor = doctor;
+	}
+
+	public Patient getPatient() {
+		return patient;
+	}
+
+	public void setPatient(Patient patient) {
+		this.patient = patient;
+	}
+	
+	
+	
+	
  
 	 
 	 /*private Boolean runnyNose;

@@ -29,13 +29,17 @@ public class Diagnosis  implements Serializable{
 	 
 	 @ManyToMany(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
 	 private Set<Medicine> medicines = new HashSet<>();
+	 
+	 @Column
+	 private boolean operation;
 
-	public Diagnosis(Long id, Date dateOfDiagnosis, Disease disease, Set<Medicine> medicines) {
+	public Diagnosis(Long id, Date dateOfDiagnosis, Disease disease, Set<Medicine> medicines, boolean operation) {
 		super();
 		this.id = id;
 		this.dateOfDiagnosis = dateOfDiagnosis;
 		this.disease = disease;
 		this.medicines = medicines;
+		this.operation=operation;
 	}
 
 	public Diagnosis(Long id, Date dateOfDiagnosis, Disease disease) {
@@ -79,6 +83,14 @@ public class Diagnosis  implements Serializable{
 
 	public void setMedicines(Set<Medicine> medicines) {
 		this.medicines = medicines;
+	}
+
+	public boolean isOperation() {
+		return operation;
+	}
+
+	public void setOperation(boolean operation) {
+		this.operation = operation;
 	}
 
 	@Override

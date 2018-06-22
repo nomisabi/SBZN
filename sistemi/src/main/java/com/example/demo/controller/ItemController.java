@@ -19,7 +19,7 @@ public class ItemController {
 	public Item getQuestions(@RequestParam(required = true) String id, @RequestParam(required = true) String name, @RequestParam(required = true) double cost, @RequestParam(required = true) double salePrice) {
 
 		Item newItem = new Item(Long.parseLong(id), name, cost, salePrice);
-
+		System.out.println("newItem: "+newItem);
 		Item i2 = itemService.getClassifiedItem(newItem);
 
 		return i2;

@@ -10,6 +10,7 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 
@@ -31,6 +32,7 @@ public class Patient implements Serializable{
 	 private Set<Allergy> listOfAllergy  = new HashSet<>();
 	 
 	 @OneToMany(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
+	 @JoinColumn(name = "examination_id")
 	 private Set<MedicalExamination> examinations = new HashSet<>();
 
 	public Patient(Long id, String firstName, String lastName, Set<Allergy> listOfAllergy,

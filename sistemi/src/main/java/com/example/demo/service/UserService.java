@@ -2,6 +2,8 @@ package com.example.demo.service;
 import java.util.List;
 import java.util.Optional;
 
+import org.kie.api.runtime.KieContainer;
+import org.kie.api.runtime.KieSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,9 +29,25 @@ public class UserService {
 	AuthorityRepository authorityRepository;
 	@Autowired
 	PasswordEncoder passwordEncoder;
+	@Autowired
+	private KieContainer kieContainer;
 
 	public User save(User user, String role) {
-		System.out.println("save");
+		List<User> users= userRepository.findAll();
+		
+		KieSession kieSession = kieContainer.newKieSession();
+		
+		for (User u : users) {
+			kieSession.insert(u);
+		}
+	    kieSession.insert(user);
+	    kieSession.getAgenda().getAgendaGroup("unique").setFocus();
+	    int fire = kieSession.fireAllRules();
+	    kieSession.dispose();
+	    System.out.println("fire "+fire);
+	    if (fire!=0)
+	    	return null;
+	    
 		user = userRepository.save(user);
 		Authority authority = authorityRepository.findByName(role);
 
