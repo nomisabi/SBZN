@@ -44,8 +44,24 @@ public class PatientService {
 		Optional<User> doctor = userRep.findById(id);
 		if (doctor.get()==null)
 			return null;
-		List<Patient> returnVal = new ArrayList<>();
-		returnVal.addAll( doctor.get().getPatients());
+		List<Patient> patients =findAll();
+		List<Patient> returnVal =new ArrayList<>();
+		System.out.println(doctor.get().getId());
+		for (Patient patient : patients) {
+			if (patient.getDoctor()!=null)
+				if (patient.getDoctor().getId()==doctor.get().getId())
+					returnVal.add(patient);
+		}
+		return returnVal;
+	}
+
+	public List<Patient> findAllWithoutDoctor() {
+		List<Patient> patients =findAll();
+		List<Patient> returnVal =new ArrayList<>();
+		for (Patient patient : patients) {
+			if (patient.getDoctor()==null)
+					returnVal.add(patient);
+		}
 		return returnVal;
 	}
 }

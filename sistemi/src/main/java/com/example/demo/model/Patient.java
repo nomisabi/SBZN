@@ -12,6 +12,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
 @Entity
@@ -34,6 +35,9 @@ public class Patient implements Serializable{
 	 @OneToMany(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
 	 @JoinColumn(name = "examination_id")
 	 private Set<MedicalExamination> examinations = new HashSet<>();
+	 
+	 @ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
+	 private User doctor;
 
 	public Patient(Long id, String firstName, String lastName, Set<Allergy> listOfAllergy,
 			Set<MedicalExamination> examinations) {
@@ -43,6 +47,17 @@ public class Patient implements Serializable{
 		this.lastName = lastName;
 		this.listOfAllergy = listOfAllergy;
 		this.examinations = examinations;
+	}
+	
+	public Patient(Long id, String firstName, String lastName, Set<Allergy> listOfAllergy,
+			Set<MedicalExamination> examinations, User doctor) {
+		super();
+		this.id = id;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.listOfAllergy = listOfAllergy;
+		this.examinations = examinations;
+		this.doctor=doctor;
 	}
 
 	public Patient() {
@@ -87,6 +102,14 @@ public class Patient implements Serializable{
 
 	public void setExaminations(Set<MedicalExamination> examinations) {
 		this.examinations = examinations;
+	}
+
+	public User getDoctor() {
+		return doctor;
+	}
+
+	public void setDoctor(User doctor) {
+		this.doctor = doctor;
 	}
 	 
 	 

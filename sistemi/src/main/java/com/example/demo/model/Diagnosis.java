@@ -12,6 +12,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 
 @Entity
 public class Diagnosis  implements Serializable{
@@ -24,7 +25,7 @@ public class Diagnosis  implements Serializable{
 	 @Column
 	 private Date dateOfDiagnosis;
 	 
-	 @Column
+	 @ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
 	 private Disease disease;
 	 
 	 @ManyToMany(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)

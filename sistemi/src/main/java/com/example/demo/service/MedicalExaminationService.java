@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -7,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.model.MedicalExamination;
+import com.example.demo.model.Patient;
 import com.example.demo.repository.MedicalExaminationRepository;
 
 @Service
@@ -33,5 +35,16 @@ public class MedicalExaminationService {
 	
 	public void delete(MedicalExamination medicalExamination) {
 		medicalExaminationRep.delete(medicalExamination);
+	}
+
+	public List<MedicalExamination> findAllByDoctor(Long id) {
+		List<MedicalExamination> mes =findAll();
+		List<MedicalExamination> returnVal =new ArrayList<>();
+		for (MedicalExamination me : mes) {
+			if (me.getDoctor()!=null)
+				if (me.getDoctor().getId()==id)
+					returnVal.add(me);
+		}
+		return returnVal;
 	}
 }

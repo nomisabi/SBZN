@@ -21,7 +21,7 @@ public class PatientDTO {
 	 private String firstName;
 	 private String lastName;
 	 private Set<AllergyDTO> listOfAllergy  = new HashSet<>();
-	 private Set<MedicalExiaminationDTO> examinations = new HashSet<>();
+	// private Set<MedicalExiaminationDTO> examinations = new HashSet<>();
 	 
 	public PatientDTO(Patient p) {
 		super();
@@ -31,9 +31,9 @@ public class PatientDTO {
 		for (Allergy a : p.getListOfAllergy()) {
 			listOfAllergy.add(new AllergyDTO(a));
 		}
-		for (MedicalExamination me: p.getExaminations()) {
-			this.examinations.add(new MedicalExiaminationDTO(me));
-		}		
+	//	for (MedicalExamination me: p.getExaminations()) {
+	//		this.examinations.add(new MedicalExiaminationDTO(me));
+//		}		
 	}
 	public PatientDTO() {
 		
@@ -62,12 +62,12 @@ public class PatientDTO {
 	public void setListOfAllergy(Set<AllergyDTO> listOfAllergy) {
 		this.listOfAllergy = listOfAllergy;
 	}
-	public Set<MedicalExiaminationDTO> getExaminations() {
-		return examinations;
-	}
-	public void setExaminations(Set<MedicalExiaminationDTO> examinations) {
-		this.examinations = examinations;
-	}
+	//public Set<MedicalExiaminationDTO> getExaminations() {
+//		return examinations;
+//	}
+//	public void setExaminations(Set<MedicalExiaminationDTO> examinations) {
+//		this.examinations = examinations;
+//	}
 	
 	public static Patient getPatient(PatientDTO patient) {
 		Set<Allergy> alergy= new HashSet<>();
@@ -75,9 +75,9 @@ public class PatientDTO {
 			alergy.add(AllergyDTO.getAllergy(allergyDTO));
 		}
 		Set<MedicalExamination> me= new HashSet<>();
-		for (MedicalExiaminationDTO meDTO : patient.getExaminations()) {
-			me.add(MedicalExiaminationDTO.getMedicalExamination(meDTO));
-		}
+	//	for (MedicalExiaminationDTO meDTO : patient.getExaminations()) {
+	//		me.add(MedicalExiaminationDTO.getMedicalExamination(meDTO));
+	//	}
 		return new Patient(patient.getId(), patient.getFirstName(),patient.getLastName(), alergy, me );
 		
 	}

@@ -63,7 +63,13 @@ public class Allergy implements Serializable{
 	public void setMedicine(Medicine medicine) {
 		this.medicine = medicine;
 	}
+
+	@Override
+	public String toString() {
+		return "Allergy [id=" + id + ", ingredient=" + ingredient + ", medicine=" + medicine + "]";
+	}
 	 
 	 
+	
 	 
 }

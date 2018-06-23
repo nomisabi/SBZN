@@ -85,4 +85,11 @@ public class Medicine implements Serializable{
 		this.ingredients = ingredients;
 	}
 
+	@Override
+	public String toString() {
+		return "Medicine [id=" + id + ", name=" + name + ", category=" + category + ", ingredients=" + ingredients
+				+ "]";
+	}
+	
+
 }

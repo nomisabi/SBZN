@@ -7,7 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.model.Diagnosis;
+import com.example.demo.repository.AllergyRepository;
 import com.example.demo.repository.DiagnosisRepository;
+import com.example.demo.repository.MedicineRepository;
 
 @Service
 public class DiagnosisService {
