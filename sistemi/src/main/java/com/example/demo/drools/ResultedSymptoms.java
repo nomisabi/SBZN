@@ -36,14 +36,15 @@ public class ResultedSymptoms {
 		this.diseaseWithSymptoms = diseaseWithSymptoms;
 	}
 	
-	Map<Disease, List<Symptom>> sorted = diseaseWithSymptoms.entrySet().stream()
+	public Map<Disease, List<Symptom>> sorted() {
+		return diseaseWithSymptoms.entrySet().stream()
 	        .sorted(comparingInt(e->e.getValue().size()))
 	        .collect(toMap(
 	                Map.Entry::getKey,
 	                Map.Entry::getValue,
 	                (a,b) -> {throw new AssertionError();},
 	                LinkedHashMap::new
-	        ));
+	        ));}
 
 	@Override
 	public String toString() {

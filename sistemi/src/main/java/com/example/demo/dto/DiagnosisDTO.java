@@ -19,6 +19,8 @@ public class DiagnosisDTO {
 	 private DiseaseDTO disease;
 	 private Set<MedicineDTO> medicines = new HashSet<>();
 	 private boolean operation;
+	 private Date dateOfHealing;
+	 private boolean healed;
 	 
 	 public DiagnosisDTO() {
 		 
@@ -33,6 +35,8 @@ public class DiagnosisDTO {
 			medicines.add(new MedicineDTO(m));
 		}
 		this.operation=diagnosis.isOperation(); 
+		this.dateOfHealing= diagnosis.getDateOfHealing();
+		this.healed=diagnosis.isHealed();
 		 }
 
 	public Long getId() {
@@ -75,6 +79,24 @@ public class DiagnosisDTO {
 		this.operation = operation;
 	}
 	
+	
+	
+	public Date getDateOfHealing() {
+		return dateOfHealing;
+	}
+
+	public void setDateOfHealing(Date dateOfHealing) {
+		this.dateOfHealing = dateOfHealing;
+	}
+
+	public boolean isHealed() {
+		return healed;
+	}
+
+	public void setHealed(boolean healed) {
+		this.healed = healed;
+	}
+
 	public static Diagnosis getDiagnosis(DiagnosisDTO diagnosisDTO) {
 		Disease dis = null;
 		if (diagnosisDTO.getDisease()!=null)
@@ -83,7 +105,7 @@ public class DiagnosisDTO {
 		for (MedicineDTO medicineDTO : diagnosisDTO.getMedicines()) {
 			medicines.add(MedicineDTO.getMedicine(medicineDTO));
 		}
-		return new Diagnosis(diagnosisDTO.getId(), diagnosisDTO.getDateOfDiagnosis(), dis, medicines, diagnosisDTO.isOperation());
+		return new Diagnosis(diagnosisDTO.getId(), diagnosisDTO.getDateOfDiagnosis(), dis, medicines, diagnosisDTO.isOperation(), diagnosisDTO.getDateOfHealing(), diagnosisDTO.isHealed());
 	}
 	 
 }

@@ -91,7 +91,7 @@ public class DiseaseDTO {
 		for (SymptomDTO s: diseaseDTO.simptons) {
 			symptoms.add(SymptomDTO.getSymptom(s));
 		}
-		return new Disease(diseaseDTO.getId(),diseaseDTO.getName(), diseaseDTO.getTemperatureMax(), diseaseDTO.getTemperatureMin(), diseaseDTO.getCategory(), symptoms);
+		return new Disease(diseaseDTO.getId(),diseaseDTO.getName(), diseaseDTO.getTemperatureMin(), diseaseDTO.getTemperatureMax(), diseaseDTO.getCategory(), symptoms);
 		
 	}
 	  

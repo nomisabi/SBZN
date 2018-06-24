@@ -33,14 +33,22 @@ public class Diagnosis  implements Serializable{
 	 
 	 @Column
 	 private boolean operation;
+	 @Column
+	 private Date dateOfHealing;
+	 @Column
+	 private boolean healed;
+	 
 
-	public Diagnosis(Long id, Date dateOfDiagnosis, Disease disease, Set<Medicine> medicines, boolean operation) {
+	public Diagnosis(Long id, Date dateOfDiagnosis, Disease disease, Set<Medicine> medicines, boolean operation, 
+			Date dateOfHealing, boolean healed) {
 		super();
 		this.id = id;
 		this.dateOfDiagnosis = dateOfDiagnosis;
 		this.disease = disease;
 		this.medicines = medicines;
 		this.operation=operation;
+		this.dateOfHealing=dateOfHealing;
+		this.healed=healed;
 	}
 
 	public Diagnosis(Long id, Date dateOfDiagnosis, Disease disease) {
@@ -92,6 +100,23 @@ public class Diagnosis  implements Serializable{
 
 	public void setOperation(boolean operation) {
 		this.operation = operation;
+	}
+
+	
+	public Date getDateOfHealing() {
+		return dateOfHealing;
+	}
+
+	public void setDateOfHealing(Date dateOfHealing) {
+		this.dateOfHealing = dateOfHealing;
+	}
+
+	public boolean isHealed() {
+		return healed;
+	}
+
+	public void setHealed(boolean healed) {
+		this.healed = healed;
 	}
 
 	@Override

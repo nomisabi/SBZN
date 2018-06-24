@@ -1,14 +1,21 @@
 package com.example.demo.service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
+import org.kie.api.runtime.KieContainer;
+import org.kie.api.runtime.KieSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.example.demo.drools.MedicalExaminationEvent;
+import com.example.demo.model.MedicalExamination;
 import com.example.demo.model.Patient;
 import com.example.demo.model.User;
+import com.example.demo.repository.MedicalExaminationRepository;
 import com.example.demo.repository.PatientRepository;
 import com.example.demo.repository.UserRepository;
 
@@ -19,6 +26,10 @@ public class PatientService {
 	private PatientRepository patientRep;
 	@Autowired
 	private UserRepository userRep;
+	@Autowired
+	private KieContainer kieContainer;
+	@Autowired
+	private MedicalExaminationRepository medRep;
 	
 	public Patient save(Patient patient) {
 		return patientRep.save(patient);
@@ -63,5 +74,75 @@ public class PatientService {
 					returnVal.add(patient);
 		}
 		return returnVal;
+	}
+
+	public List<Patient> getReport1() {
+		
+		KieSession kieSession = kieContainer.newKieSession();
+		Set<Long> patients = new HashSet<Long>();
+		kieSession.insert(patients);
+		List<MedicalExamination> me= medRep.findAll();
+		for (MedicalExamination medicalExamination : me) {
+			kieSession.insert(new MedicalExaminationEvent(medicalExamination));
+		}	 
+		kieSession.getAgenda().getAgendaGroup("report-chr").setFocus();
+	    int fire = kieSession.fireAllRules();
+	    kieSession.dispose();
+	    System.out.println(patients.size());
+	    List<Patient> pRet= new ArrayList<>();
+	    for (Long p : patients) {
+			Optional<Patient> pat= patientRep.findById(p);
+			if (pat.get()!=null)
+				pRet.add(pat.get());
+		}
+		return pRet;
+	}
+	
+	public List<Patient> getReport2() {
+		
+		KieSession kieSession = kieContainer.newKieSession();
+		Set<Long> patients = new HashSet<Long>();
+		kieSession.insert(patients);
+		List<MedicalExamination> me= medRep.findAll();
+		for (MedicalExamination medicalExamination : me) {
+			kieSession.insert(new MedicalExaminationEvent(medicalExamination));
+		}	    
+		kieSession.getAgenda().getAgendaGroup("report-add").setFocus();
+	    int fire = kieSession.fireAllRules();
+	    kieSession.dispose();
+	    List<Patient> pRet= new ArrayList<>();
+	    for (Long p : patients) {
+			Optional<Patient> pat= patientRep.findById(p);
+			if (pat.get()!=null)
+				pRet.add(pat.get());
+		}
+		return pRet;
+	}
+	
+	public List<Patient> getReport3() {
+		
+		KieSession kieSession = kieContainer.newKieSession();
+		Set<Long> patients = new HashSet<Long>();
+		kieSession.insert(patients);
+		List<MedicalExamination> me= medRep.findAll();
+		System.out.println("me: "+me.size());
+		for (MedicalExamination medicalExamination : me) {
+			MedicalExaminationEvent mevent= new MedicalExaminationEvent(medicalExamination);
+			if (mevent==null)
+				System.out.println("vmiert null ");
+			if (kieSession==null)
+				System.out.println("kieSession null ");
+			kieSession.insert(mevent);
+		}	    
+		kieSession.getAgenda().getAgendaGroup("report-imm").setFocus();
+	    int fire = kieSession.fireAllRules();
+	    kieSession.dispose();
+	    List<Patient> pRet= new ArrayList<>();
+	    for (Long p : patients) {
+			Optional<Patient> pat= patientRep.findById(p);
+			if (pat.get()!=null)
+				pRet.add(pat.get());
+		}
+		return pRet;
 	}
 }

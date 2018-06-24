@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -106,7 +107,7 @@ public class PatientController {
 	}
 	
 	@RequestMapping(value = "patients/{id}/examinations", method = RequestMethod.POST, consumes = "application/json")
-	public ResponseEntity<String> newExamination(@PathVariable Long id,@RequestBody MedicalExiaminationDTO examinationDTO) {
+	public ResponseEntity<MedicalExiaminationDTO> newExamination(@PathVariable Long id,@RequestBody MedicalExiaminationDTO examinationDTO) {
 		Optional<Patient> p=patientService.findOne(id);
 		if (p.get()==null)
 			return new ResponseEntity<>( HttpStatus.BAD_REQUEST);
@@ -127,7 +128,18 @@ public class PatientController {
 		p.get().setExaminations(me);
 		patientService.save(p.get());
 		
-		return new ResponseEntity<>( HttpStatus.CREATED);		
+		return new ResponseEntity<>(new MedicalExiaminationDTO(m), HttpStatus.CREATED);		
+	}
+	
+	@RequestMapping(value = "resoner", method = RequestMethod.POST, consumes = "application/json")
+	public ResponseEntity<DiseaseDTO> startResoner(@RequestBody MedicalExiaminationDTO examinationDTO) {
+
+		MedicalExamination m= examinationDTO.getMedicalExamination(examinationDTO);
+		Disease d= examinationService.startResoner(m);
+		DiseaseDTO dDTO=new DiseaseDTO();
+		if (d!=null)
+			dDTO= new DiseaseDTO(d);
+		return new ResponseEntity<>(dDTO,HttpStatus.OK);		
 	}
 	
 	@RequestMapping(value = "user/{id}/examinations", method = RequestMethod.GET, consumes = "application/json")
@@ -254,12 +266,61 @@ public class PatientController {
 		Optional<Disease> disease = diseaseService.findOne(id);
 		if (disease.get()==null)
 			return new ResponseEntity<>( HttpStatus.BAD_REQUEST);
+		System.out.println("diseaseId: "+id);
 		List<Symptom> symptoms = symptomService.findSymptom(disease.get());
 		List<SymptomDTO> symptomDTO = new ArrayList<>();
 		for (Symptom s : symptoms) {
 			symptomDTO.add(new SymptomDTO(s));
 		}
+		System.out.println("symprom size: "+symptomDTO.size());
 		
 		return new ResponseEntity<>(symptomDTO, HttpStatus.OK);		
 	}
+	
+	@RequestMapping(value = "examinations/{id}/heal", method = RequestMethod.PUT, consumes = "application/json")
+	public ResponseEntity<MedicalExiaminationDTO> healedPatient(@PathVariable Long id) {
+		Optional<MedicalExamination> me = examinationService.findOne(id);
+		if (me.get()==null)
+			return new ResponseEntity<>( HttpStatus.BAD_REQUEST);
+		if (me.get().getDiagnosis()==null)
+			return new ResponseEntity<>( HttpStatus.BAD_REQUEST);
+		me.get().getDiagnosis().setDateOfHealing(new Date());
+		me.get().getDiagnosis().setHealed(true);
+		MedicalExamination meD= examinationService.save(me.get());
+		
+		return new ResponseEntity<>(new MedicalExiaminationDTO(meD), HttpStatus.OK);		
+	}
+	
+	@RequestMapping(value = "report/1", method = RequestMethod.GET, consumes = "application/json")
+	public ResponseEntity<List<PatientDTO>> getReport1() {
+		List<Patient> patients = patientService.getReport1();
+		List<PatientDTO> pDTO =new ArrayList<PatientDTO>();
+		for (Patient patient : patients) {
+			pDTO.add(new PatientDTO(patient));
+		}		
+		return new ResponseEntity<>(pDTO, HttpStatus.OK);		
+	}
+	
+	@RequestMapping(value = "report/2", method = RequestMethod.GET, consumes = "application/json")
+	public ResponseEntity<List<PatientDTO>> getReport2() {
+		List<Patient> patients = patientService.getReport2();
+		List<PatientDTO> pDTO =new ArrayList<PatientDTO>();
+		for (Patient patient : patients) {
+			pDTO.add(new PatientDTO(patient));
+		}
+		
+		return new ResponseEntity<>(pDTO, HttpStatus.OK);		
+	}
+	
+	@RequestMapping(value = "report/3", method = RequestMethod.GET, consumes = "application/json")
+	public ResponseEntity<List<PatientDTO>> getReport3() {
+		List<Patient> patients = patientService.getReport3();
+		List<PatientDTO> pDTO =new ArrayList<PatientDTO>();
+		for (Patient patient : patients) {
+			pDTO.add(new PatientDTO(patient));
+		}
+		
+		return new ResponseEntity<>(pDTO, HttpStatus.OK);		
+	}
 }
+

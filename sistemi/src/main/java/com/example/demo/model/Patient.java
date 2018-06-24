@@ -111,6 +111,12 @@ public class Patient implements Serializable{
 	public void setDoctor(User doctor) {
 		this.doctor = doctor;
 	}
+
+	@Override
+	public String toString() {
+		return "Patient [id=" + id + ", firstName=" + firstName + ", lastName=" + lastName + ", listOfAllergy="
+				+ listOfAllergy + ", examinations=" + examinations + ", doctor=" + doctor + "]";
+	}
 	 
 	 
 }

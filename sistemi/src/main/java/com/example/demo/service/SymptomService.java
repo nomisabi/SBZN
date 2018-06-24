@@ -1,7 +1,14 @@
 package com.example.demo.service;
 
+import static java.util.Comparator.comparingInt;
+import static java.util.stream.Collectors.toMap;
+
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.kie.api.runtime.KieContainer;
@@ -10,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.drools.Diseases;
+import com.example.demo.drools.FoundDisease;
 import com.example.demo.drools.ResultedSymptoms;
 import com.example.demo.model.Disease;
 import com.example.demo.model.Symptom;
@@ -78,13 +86,23 @@ public class SymptomService {
 	    kieSession.fireAllRules();
 	    kieSession.dispose();
 	    
-	    System.out.println("r: "+r.toString());
-		
-	    List<Disease> diseasesRet = new ArrayList<>();
-	    for (Disease disease : r.getDiseaseWithSymptoms().keySet()) {
-	    	diseasesRet.add(disease);
-		}
 	    
+	    System.out.println("r: "+r.toString());
+	  //  r.sorted();
+	    Map<Disease, List<Symptom>> sorted = r.getDiseaseWithSymptoms().entrySet().stream()
+		        .sorted(comparingInt(e->e.getValue().size()))
+		        .collect(toMap(
+		                Map.Entry::getKey,
+		                Map.Entry::getValue,
+		                (a,b) -> {throw new AssertionError();},
+		                LinkedHashMap::new
+		        ));
+	    
+	    List<Disease> diseasesRet = new ArrayList<>();
+	    for (Disease dis : sorted.keySet()) {
+	    	diseasesRet.add(dis);
+		}
+	    Collections.reverse(diseasesRet);
 		return diseasesRet;
 	}
 	
@@ -104,11 +122,19 @@ public class SymptomService {
 	    kieSession.fireAllRules();
 	    kieSession.dispose();
 		
-	    List<Symptom> symptomRet = new ArrayList<>();
-	    for (Symptom s : r.getDiseaseWithSymptoms().get(d)) {
-	    	symptomRet.add(s);
-		}
+	    System.out.println("r: "+r.toString());
 	    
+	    List<Symptom> symptomRet = new ArrayList<>();
+	    for (Disease dis : r.getDiseaseWithSymptoms().keySet()) {
+	    	for (Symptom s: r.getDiseaseWithSymptoms().get(dis))
+	    		symptomRet.add(s);
+		}
+	    Collections.sort(symptomRet, new Comparator<Symptom>() {
+	        @Override
+	        public int compare(Symptom s1, Symptom s2) {
+	            return Boolean.compare(s2.isSpecificSymptom(),s1.isSpecificSymptom());
+	        }
+	    });
 		return symptomRet;
 	}
 }
