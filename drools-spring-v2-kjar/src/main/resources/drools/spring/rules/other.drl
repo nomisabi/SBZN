@@ -1,0 +1,69 @@
+package drools.spring.rules;
+
+import java.util.List;
+import com.example.demo.model.User;
+import com.example.demo.model.Medicine;
+import com.example.demo.model.Ingredient;
+import com.example.demo.model.Allergy;
+import com.example.demo.model.Disease;
+import com.example.demo.model.Symptom;
+import com.example.demo.drools.Diseases;
+import com.example.demo.drools.ResultedSymptoms;
+import com.example.demo.drools.FoundDisease;
+
+
+rule "check allergy medicine"
+	agenda-group "allergy"
+	when 
+		$a: Allergy($medicine: medicine != null)
+		$m: Medicine(id == $medicine.id)
+	then
+		
+end
+	
+	
+rule "check allergy ingredients"
+	agenda-group "allergy"
+	when 
+		$a: Allergy(ingredient != null)
+		$m: Medicine()
+		Ingredient(id == $a.ingredient.id) from  $m.ingredients
+	then
+		
+end
+
+
+query isSymptomInDisease( Disease x, Symptom y)
+  Diseases( x, y; ) 
+end
+
+
+
+rule "Find diseases"
+	agenda-group "diseases"
+    when   
+    	$f: ResultedSymptoms()    	
+    	isSymptomInDisease(d, s;) 
+    	$s: Symptom(id==s.getId()) 
+    	$dise: Diseases(disease.getId()==d.getId(), symptom.getId()==s.getId())
+    then
+    	System.out.println("123");
+    	$f.add(d,s);
+    	delete($dise)
+    	update($f);
+end
+
+rule "Find symptoms"
+	agenda-group "diseases"
+    when   
+    	$f: ResultedSymptoms()    	
+    	isSymptomInDisease(d, s;) 
+    	$s: Disease(id==d.getId()) 
+    	$dise: Diseases(disease.getId()==d.getId(), symptom.getId()==s.getId())
+    then
+    	System.out.print(d.getId()+ " " +s.getId());
+    	$f.add(d,s);
+    	delete($dise)
+    	update($f);
+end
+

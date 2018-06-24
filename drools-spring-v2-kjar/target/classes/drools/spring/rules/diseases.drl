@@ -1,0 +1,496 @@
+package drools.spring.rules;
+
+import java.util.List;
+import com.example.demo.model.Patient;
+import com.example.demo.drools.SpecificDisease;
+import com.example.demo.model.MedicalExamination;
+import com.example.demo.model.Symptom;
+import com.example.demo.model.Diagnosis;
+import com.example.demo.model.Medicine;
+import com.example.demo.drools.MedicalExaminationEvent;
+import com.example.demo.drools.ResultDisease;
+
+query isSymptomInColdness(String x)
+	SpecificDisease("Coldness",x;)
+end
+
+rule "isColdness"
+	when 
+		Number ($x:intValue>=4) from accumulate(
+			$s:Symptom(name=="runnyNose" || name=="soreThroat"  || name=="headache"  || name=="sneeze"  || name=="cought", specificSymptom==false),
+			count($s)
+			)
+		$r: ResultDisease(per<(double)($x)/5, third==false)	
+	then
+		System.out.println("coldness with "+((double)($x)/5));
+		$r.setPer((double)($x)/5);
+		$r.setDiseaseId(147L);
+end
+
+rule "isFever without temperature"
+	when 	
+		Number ($x: intValue>=4) from accumulate(
+			$s:Symptom(name=="runnyNose" || name=="soreThroat"  || name=="headache"  || name=="sneeze"  || name=="cought"  || name=="chills", specificSymptom==false),
+			count($s)
+			)
+		$r: ResultDisease(per<(double)($x)/7, third==false)			
+	then
+		System.out.println("fever with "+((double)($x)/7));
+		$r.setPer((double)($x)/7);
+		$r.setDiseaseId(148L);
+end
+
+rule "isFever with temperature"
+	when 
+		MedicalExamination(temperature >= 38)	
+		Number ($x: intValue>=3) from accumulate(
+			$s:Symptom(name=="runnyNose" || name=="soreThroat"  || name=="headache"  || name=="sneeze"  || name=="cought"  || name=="chills", specificSymptom==false),
+			count($s)
+			)
+		$r: ResultDisease(per<(double)($x+1)/7, third==false)			
+	then
+		System.out.println("fever temp with "+((double)($x+1)/7));
+		$r.setPer((double)($x+1)/7);
+		$r.setDiseaseId(148L);
+end
+
+rule "isTonsils without temperature"
+	when 	
+		Number ($x: intValue>=4) from accumulate(
+		$s:Symptom(name=="fatigue" || name=="soreThroat"  || name=="headache" || name=="lossOfAppetite"  || name=="sneeze"  || name=="earache"  || name=="yellowSecretionFromTheNose", specificSymptom==false),
+			count($s)
+			)
+		$r: ResultDisease(per<(double)($x)/8, third==false)			
+	then
+		System.out.println("tonsils with "+((double)($x)/8));
+		$r.setPer((double)($x)/8);
+		$r.setDiseaseId(149L);
+end
+
+rule "isTonsils with temperature"
+	when 
+		MedicalExamination(temperature >= 40, temperature <= 41)	
+		Number ($x: intValue>=3) from accumulate(
+			$s:Symptom(name=="fatigue" || name=="soreThroat"  || name=="headache" || name=="lossOfAppetite"  || name=="sneeze"  || name=="earache"  || name=="yellowSecretionFromTheNose", specificSymptom==false),
+			count($s)
+			)	
+		$r: ResultDisease(per<(double)($x+1)/8, third==false)		
+	then
+		System.out.println("tonsils temp with "+((double)($x+1)/8));
+		$r.setPer((double)($x+1)/8);
+		$r.setDiseaseId(149L);
+end
+
+rule "isSinus without temperature"
+	when 	
+		MedicalExamination(temperature < 38, $pId:patient.id,$mId:id)
+		Number ($x: intValue>=3) from accumulate(
+		$s:Symptom(name=="fatigue" || name=="soreThroat"  || name=="headache" || name=="lossOfAppetite"  || name=="sneeze"  || name=="earache"  || name=="yellowSecretionFromTheNose", specificSymptom==false),
+			count($s)
+			)	
+		$m1:MedicalExaminationEvent(id==$mId)
+		Number (intValue>=1) from accumulate(
+			$m:MedicalExaminationEvent(
+				id!=$mId,
+				this meets[60d] $m1,
+				patientId==$pId,
+				diseaseId == 147 || diseaseId == 148
+				),
+			count($m)
+			)
+		$r: ResultDisease(per<(double)($x+1)/8, third==false)					
+	then
+		System.out.println("sinus with "+((double)($x+1)/8));
+		$r.setPer((double)($x+1)/8);
+		$r.setDiseaseId(161L);
+end
+
+rule "isSinus with temperature"
+	when 
+		MedicalExamination(temperature >= 38, $pId:patient.id,$mId:id)	
+		Number ($x: intValue>=2) from accumulate(
+			$s:Symptom(name=="fatigue" || name=="soreThroat"  || name=="headache" || name=="lossOfAppetite"  || name=="sneeze"  || name=="earache"  || name=="yellowSecretionFromTheNose", specificSymptom==false),
+			count($s)
+			)
+		$m1:MedicalExaminationEvent(id==$mId)
+		Number ( intValue>=1) from accumulate(
+			$m:MedicalExaminationEvent(
+				id!=$mId,
+				this meets[60d] $m1,
+				patientId==$pId,
+				diseaseId == 147 || diseaseId == 148
+				),
+			count($m)
+			)
+		$r: ResultDisease(per<(double)($x+2)/8, third==false)			
+	then
+		System.out.println("sinus temp with "+((double)($x+2)/8));
+		$r.setPer((double)($x+2)/8);
+		$r.setDiseaseId(161L);
+end
+
+rule "ido"
+	when 
+		MedicalExamination($pId:patient.id,$mId:id)	
+		$m1:MedicalExaminationEvent(id==$mId)
+		Number ( intValue>=1) from accumulate(
+			$m:MedicalExaminationEvent(
+				id!=$mId,
+				this meets[60d] $m1,
+				patientId==$pId,
+				diseaseId == 147 || diseaseId == 148
+				),
+			count($m)
+			)			
+	then
+		System.out.println("igy jo");
+end
+
+rule "isHypertension"
+	when
+		Symptom(id==151)
+		$r: ResultDisease()	
+	then
+		System.out.println("hipertension");
+		$r.setPer(1);
+		$r.setDiseaseId(153L);
+end
+		
+rule "isDiabetes"
+	when 	
+		Number ($x: intValue==4) from accumulate(
+		$s:Symptom(name=="nauseaAndVomiting" || name=="oftenUrination"  || name=="lossOfBodyWeight" || name=="exhaustion", specificSymptom==false),
+			count($s)
+			)
+		$r: ResultDisease()			
+	then
+		System.out.println("diabetes");
+		$r.setPer(1);
+		$r.setDiseaseId(154L);
+end
+
+rule "isChronicKidneyDisease with hipertension"
+	salience 10
+	when 	
+		MedicalExamination($pId:patient.id,$mId:id)	
+		$m1:MedicalExaminationEvent(id==$mId)
+		Number ( intValue>=1) from accumulate(
+			$m:MedicalExaminationEvent(
+				id!=$mId,
+				this before [182d] $m1,
+				patientId==$pId,
+				diseaseId == 153,
+				healed==false
+				),
+			count($m)
+			)	 	
+		Number ($x: intValue>=2) from accumulate(
+		$s:Symptom(name=="swollenFeetAndAnkle" || name=="chestPain"  || name=="choking" || name=="nocturia" || name=="exhaustion", specificSymptom==false),
+			count($s)
+			)
+		$r: ResultDisease(per<(double)($x+1)/7)		
+	then
+		System.out.println("isChronicKidneyDisease with hip "+ ((double)($x+1)/7));
+		$r.setPer((double)($x+1)/7);
+		$r.setDiseaseId(162L);
+		$r.setThird(true);
+end
+
+
+rule "isChronicKidneyDisease with diabetes"
+	salience 10
+	when
+		MedicalExamination($pId:patient.id,$mId:id)	
+		$m1:MedicalExaminationEvent(id==$mId)
+		Number ( intValue>=1) from accumulate(
+			$m:MedicalExaminationEvent(
+				id!=$mId,
+				patientId==$pId,
+				diseaseId == 154,
+				healed==false
+				),
+			count($m)
+			)	 	
+		Number ($x: intValue>=2) from accumulate(
+		$s:Symptom(name=="swollenFeetAndAnkle" || name=="chestPain"  || name=="choking" || name=="nocturia" || name=="exhaustion", specificSymptom==false),
+			count($s)
+			)
+		$r: ResultDisease(per<(double)($x+1)/7)		
+	then
+		System.out.println("isChronicKidneyDisease with diab "+ ((double)($x+1)/7));
+		$r.setPer((double)($x+1)/7);
+		$r.setDiseaseId(162L);
+		$r.setThird(true);
+end
+
+rule "isChronicKidneyDisease with diabetes and hypertension"
+	salience 10
+	when 	
+	MedicalExamination($pId:patient.id,$mId:id)	
+		$m1:MedicalExaminationEvent(id==$mId)
+		Number ( intValue>=1) from accumulate(
+			$m:MedicalExaminationEvent(
+				id!=$mId,
+				patientId==$pId,
+				diseaseId == 154,
+				healed==false
+				),
+			count($m)
+			)
+		Number ( intValue>=1) from accumulate(
+			$m:MedicalExaminationEvent(
+				id!=$mId,
+				this before [182d] $m1,
+				patientId==$pId,
+				diseaseId == 153,
+				healed==false
+				),
+			count($m)
+			)	
+		Number ($x: intValue>=2) from accumulate(
+		$s:Symptom(name=="swollenFeetAndAnkle" || name=="chestPain"  || name=="choking" || name=="nocturia" || name=="exhaustion", specificSymptom==false),
+			count($s)
+			)
+		$r: ResultDisease(per<(double)($x+2)/7)		
+	then
+		System.out.println("isChronicKidneyDisease with hip and diab "+ ((double)($x+2)/7));
+		$r.setPer((double)($x+2)/7);
+		$r.setDiseaseId(162L);
+		$r.setThird(true);
+end
+
+rule "isAcuteRenalInjury with operation"
+	salience 10
+	when
+		MedicalExamination($pId:patient.id,$mId:id)	
+		$m1:MedicalExaminationEvent(id==$mId)
+		Number ( intValue>=1) from accumulate(
+			$m:MedicalExaminationEvent(
+				id!=$mId,
+				patientId==$pId,
+				operation==true,
+				this meets [30d] $m1
+				),
+			count($m)
+			)	 	
+		Number ($x: intValue>=2) from accumulate(
+		$s:Symptom(name=="swollenFeetAndAnkle" || name=="diarrhea"  || name=="choking" || name=="exhaustion", specificSymptom==false),
+			count($s)
+			)
+		$r: ResultDisease(per<(double)($x+1)/7)	
+	then
+		System.out.println("isAcuteRenalInjury with op "+ ((double)($x+1)/7));
+		$r.setPer((double)($x+1)/7);
+		$r.setDiseaseId(167L);
+		$r.setThird(true);
+end
+
+rule "isAcuteRenalInjury with temp"
+	salience 10
+	when
+		MedicalExamination($pId:patient.id,$mId:id)	
+		$m1:MedicalExaminationEvent(id==$mId)
+		Number ( intValue>=1) from accumulate(
+			$m:MedicalExaminationEvent(
+				id!=$mId,
+				patientId==$pId,
+				diseaseId==148 || diseaseId==149 ||diseaseId==161,
+				this meets [14d] $m1
+				),
+			count($m)
+			)	 	
+		Number ($x: intValue>=2) from accumulate(
+		$s:Symptom(name=="swollenFeetAndAnkle" || name=="diarrhea"  || name=="choking" || name=="exhaustion", specificSymptom==false),
+			count($s)
+			)
+		$r: ResultDisease(per<(double)($x+1)/7)		
+	then
+		System.out.println("isAcuteRenalInjury with temp "+ ((double)($x+1)/7));
+		$r.setPer((double)($x+1)/7);
+		$r.setDiseaseId(167L);
+		$r.setThird(true);
+end
+
+rule "isAcuteRenalInjury with temp and operation"
+	salience 10
+	when
+		MedicalExamination($pId:patient.id,$mId:id)	
+		$m1:MedicalExaminationEvent(id==$mId)
+		Number ( intValue>=1) from accumulate(
+			$m:MedicalExaminationEvent(
+				id!=$mId,
+				patientId==$pId,
+				diseaseId==148 || diseaseId==149 ||diseaseId==161,
+				this meets [14d] $m1
+				),
+			count($m)
+			)	
+		Number ( intValue>=1) from accumulate(
+			$m:MedicalExaminationEvent(
+				id!=$mId,
+				patientId==$pId,
+				operation==true,
+				this meets [30d] $m1
+				),
+			count($m)
+			)	 	
+		Number ($x: intValue>=2) from accumulate(
+		$s:Symptom(name=="swollenFeetAndAnkle" || name=="diarrhea"  || name=="choking" || name=="exhaustion", specificSymptom==false),
+			count($s)
+			)
+		$r: ResultDisease(per<(double)($x+2)/7)		
+	then
+		System.out.println("isAcuteRenalInjury with temp and operation "+ ((double)($x+2)/7));
+		$r.setPer((double)($x+2)/7);
+		$r.setDiseaseId(167L);
+		$r.setThird(true);
+end
+
+rule "isAcuteRenalInjury with anti"
+	salience 10
+	when
+		MedicalExamination($pId:patient.id,$mId:id)	
+		$m1:MedicalExaminationEvent(id==$mId)
+		Number ( intValue>=1) from accumulate(
+			$m:MedicalExaminationEvent(
+				id!=$mId,
+				patientId==$pId,
+				$medicines: medicines,
+				//Medicine(category == Medicine.Category.ANTIBIOTICS) from medicines,
+				this meets [21d] $m1
+				) and
+				Medicine(category == Medicine.Category.ANTIBIOTICS) from $medicines,
+			count($m)
+			)	 	
+		Number ($x: intValue>=2) from accumulate(
+		$s:Symptom(name=="swollenFeetAndAnkle" || name=="diarrhea"  || name=="choking" || name=="exhaustion", specificSymptom==false),
+			count($s)
+			)	
+		$r: ResultDisease(per<(double)($x+1)/7)
+	then
+		System.out.println("isAcuteRenalInjury with anti "+ ((double)($x+1)/7));
+		$r.setPer((double)($x+1)/7);
+		$r.setDiseaseId(167L);
+		$r.setThird(true);
+end
+
+rule "isAcuteRenalInjury with anti and op"
+	salience 10
+	when
+		MedicalExamination($pId:patient.id,$mId:id)	
+		$m1:MedicalExaminationEvent(id==$mId)
+		Number ( intValue>=1) from accumulate(
+			$m:MedicalExaminationEvent(
+				id!=$mId,
+				patientId==$pId,
+				$medicines: medicines,
+				//Medicine(category == Medicine.Category.ANTIBIOTICS) from medicines,
+				this meets [21d] $m1
+				) and
+				Medicine(category == Medicine.Category.ANTIBIOTICS) from $medicines,
+			count($m)
+			)
+		Number ( intValue>=1) from accumulate(
+			$m:MedicalExaminationEvent(
+				id!=$mId,
+				patientId==$pId,
+				operation==true,
+				this meets [30d] $m1
+				),
+			count($m)
+			)		 	
+		Number ($x: intValue>=2) from accumulate(
+		$s:Symptom(name=="swollenFeetAndAnkle" || name=="diarrhea"  || name=="choking" || name=="exhaustion", specificSymptom==false),
+			count($s)
+			)	
+		$r: ResultDisease(per<(double)($x+2)/7)	
+	then
+		System.out.println("isAcuteRenalInjury with anti and op"+ ((double)($x+2)/7));
+		$r.setPer((double)($x+2)/7);
+		$r.setDiseaseId(167L);
+		$r.setThird(true);
+end
+
+
+rule "isAcuteRenalInjury with anti and temp"
+	salience 10
+	when
+		MedicalExamination($pId:patient.id,$mId:id)	
+		$m1:MedicalExaminationEvent(id==$mId)
+		Number ( intValue>=1) from accumulate(
+			$m:MedicalExaminationEvent(
+				id!=$mId,
+				patientId==$pId,
+				$medicines: medicines,
+				//Medicine(category == Medicine.Category.ANTIBIOTICS) from medicines,
+				this meets [21d] $m1
+				) and
+				Medicine(category == Medicine.Category.ANTIBIOTICS) from $medicines,
+			count($m)
+			)
+		Number ( intValue>=1) from accumulate(
+			$m:MedicalExaminationEvent(
+				id!=$mId,
+				patientId==$pId,
+				diseaseId==148 || diseaseId==149 ||diseaseId==161,
+				this meets [14d] $m1
+				),
+			count($m)
+			)	 	
+		Number ($x: intValue>=2) from accumulate(
+		$s:Symptom(name=="swollenFeetAndAnkle" || name=="diarrhea"  || name=="choking" || name=="exhaustion", specificSymptom==false),
+			count($s)
+			)
+		$r: ResultDisease(per<(double)($x+2)/7)		
+	then
+		System.out.println("isAcuteRenalInjury with anti "+ ((double)($x+2)/7));
+		$r.setPer((double)($x+2)/7);
+		$r.setDiseaseId(167L);
+		$r.setThird(true);
+end
+
+rule "isAcuteRenalInjury with anti and temp and op"
+	salience 10
+	when
+		MedicalExamination($pId:patient.id,$mId:id)	
+		$m1:MedicalExaminationEvent(id==$mId)
+		Number ( intValue>=1) from accumulate(
+			$m:MedicalExaminationEvent(
+				id!=$mId,
+				patientId==$pId,
+				$medicines: medicines,
+				//Medicine(category == Medicine.Category.ANTIBIOTICS) from medicines,
+				this meets [21d] $m1
+				) and
+				Medicine(category == Medicine.Category.ANTIBIOTICS) from $medicines,
+			count($m)
+			)	 	
+		Number ( intValue>=1) from accumulate(
+			$m:MedicalExaminationEvent(
+				id!=$mId,
+				patientId==$pId,
+				diseaseId==148 || diseaseId==149 ||diseaseId==161,
+				this meets [14d] $m1
+				),
+			count($m)
+			)	
+		Number ( intValue>=1) from accumulate(
+			$m:MedicalExaminationEvent(
+				id!=$mId,
+				patientId==$pId,
+				operation==true,
+				this meets [30d] $m1
+				),
+			count($m)
+			)	
+		Number ($x: intValue>=2) from accumulate(
+		$s:Symptom(name=="swollenFeetAndAnkle" || name=="diarrhea"  || name=="choking" || name=="exhaustion", specificSymptom==false),
+			count($s)
+			)
+		$r: ResultDisease(per<(double)($x+3)/7)
+	then
+		System.out.println("isAcuteRenalInjury with anti "+ ((double)($x+3)/7));
+		$r.setPer((double)($x+3)/7);
+		$r.setDiseaseId(167L);
+		$r.setThird(true);
+end

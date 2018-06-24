@@ -1,0 +1,96 @@
+package drools.spring.rules;
+
+import com.example.demo.model.User;
+import com.example.demo.model.Symptom;
+import com.example.demo.model.Medicine;
+import com.example.demo.model.Disease;
+import com.example.demo.model.Ingredient;
+
+rule "Unique username"
+	agenda-group "unique"
+    when
+        $u: User( $username: username )
+        Number(intValue >= 1) from accumulate(
+             $u2: User(
+                this != $u, 
+                username == $username
+            ),
+            count($u2)
+        )
+    then
+    	$u.setUsername('Uncorrect');
+        update($u);
+end
+
+
+rule "Unique email"
+	agenda-group "unique"
+    when
+        $u: User( $email: email )
+        Number(intValue >= 1) from accumulate(
+             $u2: User(
+                this != $u, 
+                email == $email
+            ),
+            count($u2)
+        )
+    then
+    
+end
+
+rule "Unique symptoms"
+	agenda-group "unique"
+    when
+        $s: Symptom( $name: name )
+        Number(intValue >= 1) from accumulate(
+             $s2: Symptom(
+                this != $s, 
+                name == $name
+            ),
+            count($s2)
+        )
+    then
+end
+
+rule "Unique disease"
+	agenda-group "unique"
+    when
+        $s: Disease( $name: name )
+        Number(intValue >= 1) from accumulate(
+             $s2: Disease(
+                this != $s, 
+                name == $name
+            ),
+            count($s2)
+        )
+    then
+end
+
+rule "Unique ingredient"
+	agenda-group "unique"
+    when
+        $s: Ingredient( $name: name )
+        Number(intValue >= 1) from accumulate(
+             $s2: Ingredient(
+                this != $s, 
+                name == $name
+            ),
+            count($s2)
+        )
+    then
+end
+
+
+rule "Unique medicine"
+	agenda-group "unique"
+    when
+        $s: Medicine( $name: name )
+        Number(intValue >= 1) from accumulate(
+             $s2: Medicine(
+                this != $s, 
+                name == $name
+            ),
+            count($s2)
+        )
+    then
+end

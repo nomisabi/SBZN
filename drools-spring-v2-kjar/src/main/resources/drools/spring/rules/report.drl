@@ -1,0 +1,119 @@
+package drools.spring.rules;
+
+import java.util.Set;
+import com.example.demo.model.Patient;
+import com.example.demo.model.Disease;
+import com.example.demo.model.MedicalExamination;
+import com.example.demo.drools.MedicalExaminationEvent;
+import com.example.demo.model.Diagnosis;
+import com.example.demo.model.Medicine;
+
+rule "chronic"
+	agenda-group "report-chr"
+    when   
+    	$me: MedicalExaminationEvent($pId:patientId, $dId: diseaseId)
+        Number(intValue >= 4) from accumulate(
+            $me2: MedicalExaminationEvent(
+            	 this != $me, 
+                 patientId == $pId,
+                 diseaseId == $dId,
+                 diseaseId != 147, //nije prehlada
+                 diseaseId != 148, //nije groznica 
+                 this meets[730d] $me //year
+            ),
+            count($me2)
+        ) 
+        $s:Set()      
+    then
+    	System.out.println("chrinic: "+$pId);
+    	$s.add($pId);
+    	delete($me);
+end
+
+rule "addict"
+	agenda-group "report-add"
+    when   
+    	$me: MedicalExaminationEvent($pId:patientId, $dId: doctorId, $med:medicines)
+    	Medicine(category == Medicine.Category.ANALGESICS) from $med
+        Number(intValue >= 5) from accumulate(
+            $me2: MedicalExaminationEvent(
+            	 this != $me, 
+                 patientId == $pId,
+                 $med2:medicines,
+                 this meets[182d] $me
+            ),
+            //Medicine(category == Medicine.Category.ANALGESICS) from $med2,
+            count($me2)
+        )
+        Number(intValue >= 2) from accumulate(
+            $me3: MedicalExaminationEvent(
+            	 this != $me, 
+                 patientId == $pId,
+                 //Medicine(category == Medicine.Category.ANALGESICS) from medicines,
+                 this meets[182d] $me,
+                 doctorId != $dId
+            ),
+            count($me3)
+        )
+        $s:Set()   
+    then
+    	System.out.print("addict: "+$pId);
+    	$s.add($pId);
+    	delete($me);
+end
+
+rule "weak immunity"
+	agenda-group "report-imm"
+    when   
+    	$me: MedicalExaminationEvent($pId:patientId, $dId: diseaseId, $med:medicines, healed==true)
+    	Medicine(category == Medicine.Category.ANALGESICS) from $med
+        Number(intValue >= 9) from accumulate(
+            $me2: MedicalExaminationEvent(
+            	 this != $me, 
+                 patientId == $pId,
+                 healed==true,
+                  $medicines:medicines,
+                 //
+                 this meets[365d] $me
+            ) and 
+            Medicine(category == Medicine.Category.ANALGESICS) from $medicines,
+            count($me2)
+        )
+        Number(intValue >= 1) from accumulate(
+            $me3: MedicalExaminationEvent(
+            	 this != $me, 
+                 patientId == $pId,
+                 healed==true,
+                 $medicines:medicines,
+                
+                 this meets[365d] $me,
+                 diseaseId != $dId
+            ) and 
+            Medicine(category == Medicine.Category.ANALGESICS) from $medicines,
+            count($me3)
+        )
+        Number(intValue ==0 ) from accumulate(
+            $me4: MedicalExaminationEvent(
+            	 this != $me, 
+                 patientId == $pId,
+                 healed==false,
+                 $medicines:medicines,                 
+                 this meets[365d] $me
+            ) and             
+            forall ( Medicine(category != Medicine.Category.ANALGESICS) from $medicines) ,
+            count($me4)
+        )
+         $s:Set()   
+    then
+    	System.out.print("weak  immunity: "+$pId);
+    	$s.add($pId);
+    	delete($me);
+end
+
+rule "weak immunity proba"
+	agenda-group "report-imm"
+    when   
+    	$me: MedicalExaminationEvent($pId:patientId)
+    then
+    	System.out.print("weak  works: "+$pId);
+end
